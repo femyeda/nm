@@ -1,0 +1,33 @@
+/*
+ * @NOTE: Prepend a `~` to css file paths that are in your node_modules
+ *        See https://github.com/webpack-contrib/sass-loader#imports
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.testing {
+  @apply absolute inset-0 bg-white text-center h-full flex flex-col justify-center;
+}
+
+
+.card {
+  @apply bg-white px-4 py-5 border-b border-gray-200 sm:px-6;
+}
+
+.c2 {
+  @apply -ml-4 -mt-2 flex items-center justify-between flex-wrap sm:flex-nowrap;
+}
+
+.card-spacing {
+  @apply ml-4 mt-2;
+}
+
+.title {
+  @apply text-lg leading-6 font-medium text-gray-900;
+}
+
+.button {
+  @apply relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
+}
