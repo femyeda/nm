@@ -15,13 +15,27 @@
   @apply text-lg leading-6 font-medium text-gray-900;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   @apply h-full;
   @apply overflow-hidden;
 }
 
 .root {
   @apply h-full;
+}
+
+.icon {
+  @apply w-6 h-6;
+}
+
+.icon--small {
+  @apply w-5 h-5;
+}
+
+.icon--gray {
+  @apply text-gray-400;
 }
 
 .screen-container {
@@ -89,19 +103,20 @@ fieldset {
 }
 
 .messages-screen-header {
- @apply flex-shrink-0 relative h-16 bg-white flex items-center;
+  @apply flex-shrink-0 relative h-16 bg-white flex items-center;
 }
 
 .messages-screen-header-logo-container {
- @apply inset-y-0 left-0 static flex-shrink-0;
+  @apply inset-y-0 left-0 static flex-shrink-0;
 }
 
-.messages-screen-header-logo-container a {
- @apply flex items-center justify-center h-16 bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-600 w-20;
+.messages-screen-header-logo-container a,
+.messages-screen-header-logo-container div {
+  @apply flex items-center justify-center h-16 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-600 w-20;
 }
 
 .messages-screen-header-logo-container a img {
- @apply h-8 w-auto;
+  @apply h-8 w-auto;
 }
 
 .messages-screen-header .menu-button-container {
@@ -140,11 +155,18 @@ fieldset {
   @apply block w-full border-transparent pl-12 placeholder-gray-500 focus:border-transparent sm:text-sm focus:ring-0;
 }
 
-.messages-screen-header .desktop-nav-container .left:first-child .icon-container {
+.messages-screen-header
+  .desktop-nav-container
+  .left:first-child
+  .icon-container {
   @apply pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center pl-4;
 }
 
-.messages-screen-header .desktop-nav-container .left:first-child .icon-container .icon {
+.messages-screen-header
+  .desktop-nav-container
+  .left:first-child
+  .icon-container
+  .icon {
   @apply h-5 w-5;
 }
 
@@ -180,64 +202,138 @@ fieldset {
   @apply h-6 w-6;
 }
 
-.messages-screen-header .desktop-nav-container .right .actions .menu-button-container {
+.messages-screen-header
+  .desktop-nav-container
+  .right
+  .actions
+  .menu-button-container {
   @apply relative inline-block text-left;
 }
 
-.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .menu-button {
+.messages-screen-header
+  .desktop-nav-container
+  .right
+  .actions
+  .menu-button-container
+  .menu-button {
   @apply bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600;
 }
 
-.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .menu-button span {
+.messages-screen-header
+  .desktop-nav-container
+  .right
+  .actions
+  .menu-button-container
+  .menu-button
+  span {
   @apply sr-only;
 }
 
-.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .menu-button img {
+.messages-screen-header
+  .desktop-nav-container
+  .right
+  .actions
+  .menu-button-container
+  .menu-button
+  img {
   @apply h-8 w-8 rounded-full;
 }
 
-.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .enter {
+.messages-screen-header
+  .desktop-nav-container
+  .right
+  .actions
+  .menu-button-container
+  .enter {
   @apply transition ease-out duration-100;
 }
 
-.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .enterFrom {
+.messages-screen-header
+  .desktop-nav-container
+  .right
+  .actions
+  .menu-button-container
+  .enterFrom {
   @apply transform opacity-0 scale-95;
 }
 
-.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .enterTo {
+.messages-screen-header
+  .desktop-nav-container
+  .right
+  .actions
+  .menu-button-container
+  .enterTo {
   @apply transform opacity-100 scale-100;
 }
 
-.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .leave {
+.messages-screen-header
+  .desktop-nav-container
+  .right
+  .actions
+  .menu-button-container
+  .leave {
   @apply transition ease-in duration-75;
 }
 
-.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .leaveFrom {
+.messages-screen-header
+  .desktop-nav-container
+  .right
+  .actions
+  .menu-button-container
+  .leaveFrom {
   @apply transform opacity-100 scale-100;
 }
 
-.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .leaveTo {
+.messages-screen-header
+  .desktop-nav-container
+  .right
+  .actions
+  .menu-button-container
+  .leaveTo {
   @apply transform opacity-0 scale-95;
 }
 
-.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .menu-items {
+.messages-screen-header
+  .desktop-nav-container
+  .right
+  .actions
+  .menu-button-container
+  .menu-items {
   @apply origin-top-right absolute z-30 right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none;
 }
 
-.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .menu-items .menu-items-container {
+.messages-screen-header
+  .desktop-nav-container
+  .right
+  .actions
+  .menu-button-container
+  .menu-items
+  .menu-items-container {
   @apply py-1;
 }
 
-.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .menu-items .menu-item {
+.messages-screen-header
+  .desktop-nav-container
+  .right
+  .actions
+  .menu-button-container
+  .menu-items
+  .menu-item {
   @apply block px-4 py-2 text-sm text-gray-700;
 }
 
-.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .menu-items .menu-item.active {
+.messages-screen-header
+  .desktop-nav-container
+  .right
+  .actions
+  .menu-button-container
+  .menu-items
+  .menu-item.active {
   @apply bg-gray-100;
 }
 
 .messages-screen-sidebar {
-  @apply block flex-shrink-0 bg-gray-800 overflow-y-auto;
+  @apply block flex-shrink-0 bg-gray-100 overflow-y-auto;
 }
 
 .messages-screen-sidebar .sidebar-items-container {
@@ -249,7 +345,7 @@ fieldset {
 }
 
 .messages-screen-sidebar .sidebar-items-container .sidebar-item.active {
-  @apply bg-gray-900 text-white;
+  @apply bg-blue-300 text-white;
 }
 
 .messages-screen-sidebar .sidebar-items-container .sidebar-item:not(.active) {

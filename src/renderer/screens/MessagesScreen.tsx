@@ -43,20 +43,21 @@ export default function MessagesScreen() {
     }
   }, []);
 
+  const handleNewMessageClick = () => {
+    console.log("TODO handleNewMessageClick")
+  }
+
   return (
     <>
       <div className="messages-screen-container">
         {/* Top nav*/}
         <header className="messages-screen-header">
-          {/* Logo area */}
           <div className="messages-screen-header-logo-container">
-            <a href="#" className="">
-              <img
-                className=""
-                src="https://tailwindui.com/img/logos/workflow-mark.svg?color=white"
-                alt="Workflow"
-              />
-            </a>
+            <div>
+              <button onClick={handleNewMessageClick}>
+                <PencilAltIcon className="icon icon--small icon--gray" />
+              </button>
+            </div>
           </div>
 
           {/* Desktop nav area */}
