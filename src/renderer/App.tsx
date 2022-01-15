@@ -1,12 +1,11 @@
-import React from 'react';
 import {
   MemoryRouter as Router,
   Routes,
   Route,
-  useNavigate,
 } from 'react-router-dom';
 import './App.css';
 import LoginScreen from './screens/LoginScreen';
+import MessagesScreen from './screens/MessagesScreen';
 
 declare global {
   interface Window {
@@ -25,31 +24,11 @@ declare global {
   }
 }
 
-const Hello = () => {
-  const navigate = useNavigate();
-
-  React.useEffect(() => {
-    const loggedIn = window.electron.store.get('access_token');
-
-    if (!loggedIn) {
-      navigate('/login');
-    }
-  }, []);
-
-  return (
-    <>
-      <div className="hello">
-        <p className="title">iMessage clone for GMail.</p>
-      </div>
-    </>
-  );
-};
-
 export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Hello />} />
+        <Route path="/" element={<MessagesScreen />} />
         <Route path="/login" element={<LoginScreen />} />
       </Routes>
     </Router>

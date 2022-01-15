@@ -17,6 +17,7 @@
 
 html, body, #root {
   @apply h-full;
+  @apply overflow-hidden;
 }
 
 .root {
@@ -81,4 +82,196 @@ fieldset {
 
 .button__full {
   @apply w-full;
+}
+
+.messages-screen-container {
+  @apply h-full flex flex-col;
+}
+
+.messages-screen-header {
+ @apply flex-shrink-0 relative h-16 bg-white flex items-center;
+}
+
+.messages-screen-header-logo-container {
+ @apply inset-y-0 left-0 static flex-shrink-0;
+}
+
+.messages-screen-header-logo-container a {
+ @apply flex items-center justify-center h-16 bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-600 w-20;
+}
+
+.messages-screen-header-logo-container a img {
+ @apply h-8 w-auto;
+}
+
+.messages-screen-header .menu-button-container {
+  @apply absolute inset-y-0 right-0 pr-4 flex items-center sm:pr-6 md:hidden;
+}
+
+.messages-screen-header .menu-button-container button {
+  @apply -mr-2 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-600;
+}
+
+.messages-screen-header .menu-button-container button span {
+  @apply sr-only;
+}
+
+.messages-screen-header .menu-button-container button .icon {
+  @apply block h-6 w-6;
+}
+
+.messages-screen-header .desktop-nav-container {
+  @apply min-w-0 flex-1 flex items-center justify-between;
+}
+
+.messages-screen-header .desktop-nav-container .left {
+  @apply min-w-0 flex-1;
+}
+
+.messages-screen-header .desktop-nav-container .left:first-child {
+  @apply max-w-2xl relative text-gray-400 focus-within:text-gray-500;
+}
+
+.messages-screen-header .desktop-nav-container .left:first-child label {
+  @apply sr-only;
+}
+
+.messages-screen-header .desktop-nav-container .left:first-child input {
+  @apply block w-full border-transparent pl-12 placeholder-gray-500 focus:border-transparent sm:text-sm focus:ring-0;
+}
+
+.messages-screen-header .desktop-nav-container .left:first-child .icon-container {
+  @apply pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center pl-4;
+}
+
+.messages-screen-header .desktop-nav-container .left:first-child .icon-container .icon {
+  @apply h-5 w-5;
+}
+
+.messages-screen-header .desktop-nav-container .right {
+  @apply ml-10 pr-4 flex-shrink-0 flex items-center space-x-10;
+}
+
+.messages-screen-header .desktop-nav-container .right nav {
+  @apply flex space-x-10;
+}
+
+.messages-screen-header .desktop-nav-container .right nav a {
+  @apply text-sm font-medium text-gray-900;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions {
+  @apply flex items-center space-x-8;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions span {
+  @apply inline-flex;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions span a {
+  @apply -mx-1 bg-white p-1 rounded-full text-gray-400 hover:text-gray-500;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions span a span {
+  @apply sr-only;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions span a .icon {
+  @apply h-6 w-6;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions .menu-button-container {
+  @apply relative inline-block text-left;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .menu-button {
+  @apply bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .menu-button span {
+  @apply sr-only;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .menu-button img {
+  @apply h-8 w-8 rounded-full;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .enter {
+  @apply transition ease-out duration-100;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .enterFrom {
+  @apply transform opacity-0 scale-95;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .enterTo {
+  @apply transform opacity-100 scale-100;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .leave {
+  @apply transition ease-in duration-75;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .leaveFrom {
+  @apply transform opacity-100 scale-100;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .leaveTo {
+  @apply transform opacity-0 scale-95;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .menu-items {
+  @apply origin-top-right absolute z-30 right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .menu-items .menu-items-container {
+  @apply py-1;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .menu-items .menu-item {
+  @apply block px-4 py-2 text-sm text-gray-700;
+}
+
+.messages-screen-header .desktop-nav-container .right .actions .menu-button-container .menu-items .menu-item.active {
+  @apply bg-gray-100;
+}
+
+.messages-screen-sidebar {
+  @apply block flex-shrink-0 bg-gray-800 overflow-y-auto;
+}
+
+.messages-screen-sidebar .sidebar-items-container {
+  @apply relative w-20 flex flex-col p-3 space-y-3;
+}
+
+.messages-screen-sidebar .sidebar-items-container .sidebar-item {
+  @apply flex-shrink-0 inline-flex items-center justify-center h-14 w-14 rounded-lg;
+}
+
+.messages-screen-sidebar .sidebar-items-container .sidebar-item.active {
+  @apply bg-gray-900 text-white;
+}
+
+.messages-screen-sidebar .sidebar-items-container .sidebar-item:not(.active) {
+  @apply text-gray-400 hover:bg-gray-700;
+}
+
+.messages-screen-sidebar .sidebar-items-container .sidebar-item span {
+  @apply sr-only;
+}
+
+.messages-screen-sidebar .sidebar-items-container .sidebar-item .icon {
+  @apply h-6 w-6;
+}
+
+.messages-screen-bottom {
+  @apply min-h-0 flex-1 flex overflow-hidden;
+}
+
+.messages-screen-main {
+  @apply min-w-0 flex-1 border-t border-gray-200 lg:flex;
+}
+
+.messages-screen-main .content {
+  @apply min-w-0 flex-1 h-full flex flex-col overflow-y-auto lg:order-last;
 }
