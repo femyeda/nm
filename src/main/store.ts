@@ -1,10 +1,13 @@
 import Store from 'electron-store';
+type StoreType = {
+  access_token: string;
+}
 
-let store: Store
+let store: Store<StoreType>
 
-const getStore = (opts = {}) => {
+export const getStore = (opts = {}): Store<StoreType> => {
   opts = Object.assign({ defaults: {} }, opts);
-  return store || new Store(opts);
+  return store || new Store<StoreType>(opts);
 };
 
 export const set = (key: string, data: any) => {
