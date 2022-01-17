@@ -1,6 +1,8 @@
 import Store from 'electron-store';
 type StoreType = {
   access_token: string;
+  client_id: string;
+  client_secret: string;
 }
 
 let store: Store<StoreType>

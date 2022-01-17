@@ -1,32 +1,13 @@
 import { useNavigate } from 'react-router';
 import React, { Fragment } from 'react';
 import { Menu, Transition } from '@headlessui/react';
-import { SearchIcon } from '@heroicons/react/solid';
 import classNames from 'classnames';
-import {
-  ArchiveIcon,
-  BanIcon,
-  BellIcon,
-  FlagIcon,
-  InboxIcon,
-  PencilAltIcon,
-  UserCircleIcon,
-} from '@heroicons/react/outline';
+import NylasAccount from 'nylas/lib/models/account';
+import NylasThread from 'nylas/lib/models/thread';
+import NylasMessage from 'nylas/lib/models/message';
+import NylasParticipant from 'nylas/lib/models/email-participant';
+import { PencilAltIcon } from '@heroicons/react/outline';
 
-const user = {
-  name: 'Whitney Francis',
-  email: 'whitneyfrancis@example.com',
-  imageUrl:
-    'https://images.unsplash.com/photo-1517365830460-955ce3ccd263?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-};
-const sidebarNavigation = [
-  { name: 'Open', href: '#', icon: InboxIcon, current: true },
-  { name: 'Archive', href: '#', icon: ArchiveIcon, current: false },
-  { name: 'Customers', href: '#', icon: UserCircleIcon, current: false },
-  { name: 'Flagged', href: '#', icon: FlagIcon, current: false },
-  { name: 'Spam', href: '#', icon: BanIcon, current: false },
-  { name: 'Drafts', href: '#', icon: PencilAltIcon, current: false },
-];
 const userNavigation = [
   { name: 'Your Profile', href: '#' },
   { name: 'Sign out', href: '#' },
@@ -34,6 +15,13 @@ const userNavigation = [
 
 export default function MessagesScreen() {
   const navigate = useNavigate();
+
+  const [account, setAccount] = React.useState<NylasAccount>();
+  const [threads, setThreads] = React.useState<NylasThread[]>();
+  const [currentThread, setCurrentThread] = React.useState<string>('');
+  const [threadMessages, setThreadMessages] = React.useState<NylasMessage[]>(
+    []
+  );
 
   React.useEffect(() => {
     const loggedIn = window.electron.store.get('access_token');
@@ -43,9 +31,135 @@ export default function MessagesScreen() {
     }
   }, []);
 
+  React.useEffect(() => {
+    const account = window.electron.account.get();
+    setAccount(account);
+  }, []);
+
+  React.useEffect(() => {
+    const threads = window.electron.threads.get();
+    setCurrentThread(threads[0]?.id || '');
+    setThreads(threads);
+  }, []);
+
+  React.useEffect(() => {
+    if (!currentThread) {
+      return;
+    }
+
+    const messages = window.electron.threads.getMessages(currentThread);
+    setThreadMessages(messages);
+  }, [currentThread]);
+
+  const handleThreadClick = (threadId: string) => {
+    setCurrentThread(threadId);
+  };
+
+  const Sidebar = () => {
+    if (!threads || threads.length === 0 || !account) {
+      return null;
+    }
+
+    return (
+      <nav aria-label="Sidebar" className="messages-screen-sidebar">
+        <div className="sidebar-items-container">
+          {threads.map((thread) => {
+            const participants = thread.participants.filter(
+              (participant) => participant.email != account.emailAddress
+            );
+
+            return (
+              <a
+                key={thread.id}
+                onClick={() => handleThreadClick(thread.id || '')}
+                className={classNames(
+                  thread.id === currentThread ? 'active' : '',
+                  thread?.unread && 'unread',
+                  'sidebar-item'
+                )}
+              >
+                <span>{thread.id}</span>
+                <div className="avatar thread-avatar--text">
+                  <p>{participants[0].email.slice(0, 2)}</p>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </nav>
+    );
+  };
+
+  const Thread = ({ thread }: { thread: NylasThread | undefined }) => {
+    if (!thread) {
+      return null;
+    }
+
+    return (
+      <div className="thread">
+        <div className="messages">
+          {threadMessages.map((message) => {
+            return <Message key={message.id} message={message} />;
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  const ThreadParticipants = ({
+    thread,
+  }: {
+    thread: NylasThread | undefined;
+  }) => {
+    if (!thread || !account) {
+      return null;
+    }
+
+    const participants = thread.participants.filter(
+      (participant) => participant.email != account.emailAddress
+    );
+
+    const Participant = ({
+      participant,
+    }: {
+      participant: NylasParticipant;
+    }) => {
+      return (
+        <div className="thread-participant">
+          <span className="">{participant.email}</span>
+        </div>
+      );
+    };
+
+    return (
+      <div className="tread-participants-container">
+        <span>To: </span>
+        <div className="thread-participants">
+          {participants.map((participant) => (
+            <Participant key={participant.email} participant={participant} />
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const Message = ({ message }: { message: NylasMessage | undefined }) => {
+    const isFromMe =
+      account?.emailAddress &&
+      message?.from?.map((p) => p.email).includes(account?.emailAddress);
+
+    return (
+      <div
+        className={classNames('message', isFromMe ? 'from-me' : 'from-them')}
+      >
+        {message?.snippet}
+      </div>
+    );
+  };
+
   const handleNewMessageClick = () => {
-    console.log("TODO handleNewMessageClick")
-  }
+    console.log('TODO handleNewMessageClick');
+  };
 
   return (
     <>
@@ -64,33 +178,23 @@ export default function MessagesScreen() {
           <div className="desktop-nav-container">
             <div className="left">
               <div className="">
-                <label htmlFor="desktop-search" className="sr-only">
-                  Search
-                </label>
-                <input
-                  id="desktop-search"
-                  type="search"
-                  placeholder="Search"
-                  className=""
-                />
                 <div className="icon-container">
-                  <SearchIcon className="icon" aria-hidden="true" />
+                  <ThreadParticipants
+                    thread={threads?.find((t) => t.id === currentThread)}
+                  />
                 </div>
               </div>
             </div>
             <div className="right">
               <div className="actions">
-                <span className="">
-                  <a href="#" className="">
-                    <span className="sr-only">View notifications</span>
-                    <BellIcon className="icon" aria-hidden="true" />
-                  </a>
-                </span>
-
                 <Menu as="div" className="menu-button-container">
                   <Menu.Button className="menu-button">
                     <span className="">Open user menu</span>
-                    <img className="" src={user.imageUrl} alt="" />
+                    {account && (
+                      <div className="account-avatar--text">
+                        <p>{account.name.slice(0, 2)}</p>
+                      </div>
+                    )}
                   </Menu.Button>
 
                   <Transition
@@ -106,7 +210,7 @@ export default function MessagesScreen() {
                       <div className="menu-items-container">
                         {userNavigation.map((item) => {
                           return (
-                            <Menu.Item>
+                            <Menu.Item key={item.href}>
                               {({ active }) => (
                                 <a
                                   href={item.href}
@@ -133,29 +237,14 @@ export default function MessagesScreen() {
         {/* Bottom section */}
         <div className="messages-screen-bottom">
           {/* Narrow sidebar*/}
-          <nav aria-label="Sidebar" className="messages-screen-sidebar">
-            <div className="sidebar-items-container">
-              {sidebarNavigation.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className={classNames(
-                    item.current ? 'active' : '',
-                    'sidebar-item'
-                  )}
-                >
-                  <span>{item.name}</span>
-                  <item.icon className="icon" aria-hidden="true" />
-                </a>
-              ))}
-            </div>
-          </nav>
+          <Sidebar />
 
           {/* Main area */}
           <main className="messages-screen-main">
             {/* Primary column */}
             <section aria-labelledby="primary-heading" className="content">
               {/* Your content */}
+              <Thread thread={threads?.find((t) => t.id === currentThread)} />
             </section>
           </main>
         </div>

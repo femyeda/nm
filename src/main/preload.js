@@ -1,6 +1,19 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electron', {
+  account: {
+    get() {
+      return ipcRenderer.sendSync('get-account');
+    },
+  },
+  threads: {
+    get() {
+      return ipcRenderer.sendSync('get-threads')
+    },
+    getMessages(threadId) {
+      return ipcRenderer.sendSync('get-thread-messages', threadId)
+    }
+  },
   store: {
     get(val) {
       return ipcRenderer.sendSync('electron-store-get', val);

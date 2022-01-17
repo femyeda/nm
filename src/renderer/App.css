@@ -38,6 +38,150 @@ body,
   @apply text-gray-400;
 }
 
+.account-avatar--text {
+  @apply h-8 w-8 rounded-full flex flex-col justify-center content-center items-center bg-blue-400;
+}
+
+.thread-avatar--text {
+  @apply h-8 w-8 rounded-full flex flex-col justify-center content-center items-center bg-gray-400;
+}
+
+.account-avatar--text p,
+.thread-avatar--text p {
+  @apply text-white text-sm uppercase;
+}
+
+.tread-participants-container {
+  @apply flex flex-row space-x-1;
+}
+
+.thread-participants {
+  @apply flex flex-row space-x-2;
+}
+
+.thread-participant {
+  @apply inline-flex items-center text-gray-800;
+}
+
+.thread {
+  @apply h-full pl-3;
+  @apply relative;
+}
+
+/* https://codepen.io/AllThingsSmitty/pen/jommGQ */
+.messages {
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.25rem;
+  margin: 0 auto 1rem;
+  padding: 0.5rem 1.5rem;
+  @apply absolute bottom-2;
+}
+
+.message {
+  border-radius: 1.15rem;
+  line-height: 1.25;
+  max-width: 75%;
+  padding: 0.5rem 0.875rem;
+  position: relative;
+  word-wrap: break-word;
+  margin: 0.5rem 0;
+  width: fit-content;
+}
+
+.message::before,
+.message::after {
+  bottom: -0.1rem;
+  content: '';
+  height: 1rem;
+  position: absolute;
+}
+
+.message.from-me {
+  align-self: flex-end;
+  background-color: #248bf5;
+  color: #fff;
+}
+
+.message.from-me::before {
+  border-bottom-left-radius: 0.8rem 0.7rem;
+  border-right: 1rem solid #248bf5;
+  right: -0.35rem;
+  transform: translate(0, -0.1rem);
+}
+
+.message.from-me::after {
+  background-color: #fff;
+  border-bottom-left-radius: 0.5rem;
+  right: -40px;
+  transform: translate(-30px, -2px);
+  width: 10px;
+}
+
+.message[class^='from-'] {
+  margin: 0.5rem 0;
+  width: fit-content;
+}
+
+.message.from-me ~ .message.from-me {
+  margin: 0.25rem 0 0;
+}
+
+.message.from-me ~ .message.from-me:not(:last-child) {
+  margin: 0.25rem 0 0;
+}
+
+.message.from-me ~ .message.from-me:last-child {
+  margin-bottom: 0.5rem;
+}
+
+.message.from-them {
+  align-items: flex-start;
+  background-color: #e5e5ea;
+  color: #000;
+}
+
+.message.from-them:before {
+  border-bottom-right-radius: 0.8rem 0.7rem;
+  border-left: 1rem solid #e5e5ea;
+  left: -0.35rem;
+  transform: translate(0, -0.1rem);
+}
+
+.message.from-them::after {
+  background-color: #fff;
+  border-bottom-right-radius: 0.5rem;
+  left: 20px;
+  transform: translate(-30px, -2px);
+  width: 10px;
+}
+
+.message[class^='from-'].emoji {
+  background: none;
+  font-size: 2.5rem;
+}
+
+.message[class^='from-'].emoji::before {
+  content: none;
+}
+
+.no-tail::before {
+  display: none;
+}
+
+.margin-b_none {
+  margin-bottom: 0 !important;
+}
+
+.margin-b_one {
+  margin-bottom: 1rem !important;
+}
+
+.margin-t_one {
+  margin-top: 1rem !important;
+}
+
 .screen-container {
   @apply min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8;
 }
@@ -137,6 +281,9 @@ fieldset {
 
 .messages-screen-header .desktop-nav-container {
   @apply min-w-0 flex-1 flex items-center justify-between;
+  @apply h-16;
+  @apply bg-gray-50;
+  @apply border-b border-l border-zinc-100;
 }
 
 .messages-screen-header .desktop-nav-container .left {
@@ -216,7 +363,7 @@ fieldset {
   .actions
   .menu-button-container
   .menu-button {
-  @apply bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600;
+  @apply rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600;
 }
 
 .messages-screen-header
@@ -342,14 +489,22 @@ fieldset {
 
 .messages-screen-sidebar .sidebar-items-container .sidebar-item {
   @apply flex-shrink-0 inline-flex items-center justify-center h-14 w-14 rounded-lg;
+  @apply relative;
 }
 
 .messages-screen-sidebar .sidebar-items-container .sidebar-item.active {
-  @apply bg-blue-300 text-white;
+  @apply bg-blue-400 text-white;
+}
+
+.messages-screen-sidebar .sidebar-items-container .sidebar-item.unread::before {
+  content: "•";
+  @apply text-blue-400;
+  @apply absolute;
+  @apply left-0;
 }
 
 .messages-screen-sidebar .sidebar-items-container .sidebar-item:not(.active) {
-  @apply text-gray-400 hover:bg-gray-700;
+  @apply text-gray-400 hover:bg-gray-200;
 }
 
 .messages-screen-sidebar .sidebar-items-container .sidebar-item span {

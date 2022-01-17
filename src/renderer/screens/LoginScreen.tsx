@@ -5,11 +5,15 @@ export default function LoginScreen() {
   const navigate = useNavigate();
 
   const [accessToken, setAccessToken] = React.useState('');
+  const [clientId, setClientId] = React.useState('');
+  const [clientSecret, setClientSecret] = React.useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     window.electron.store.set('access_token', accessToken);
+    window.electron.store.set('client_id', clientId);
+    window.electron.store.set('client_secret', clientSecret);
     navigate('/');
   };
 
@@ -28,6 +32,36 @@ export default function LoginScreen() {
         <div className="screen-body">
           <div className="form-container">
             <form className="form" onSubmit={handleSubmit}>
+              <fieldset>
+                <label htmlFor="client_id" className="label">
+                  Nylas Client ID
+                </label>
+                <div className="">
+                  <input
+                    id="client_id"
+                    name="client_id"
+                    type="text"
+                    required
+                    className="input"
+                    onChange={(e) => setClientId(e.target.value)}
+                  />
+                </div>
+              </fieldset>
+              <fieldset>
+                <label htmlFor="client_secret" className="label">
+                  Nylas Client Secret
+                </label>
+                <div className="">
+                  <input
+                    id="client_secret"
+                    name="client_secret"
+                    type="text"
+                    required
+                    className="input"
+                    onChange={(e) => setClientSecret(e.target.value)}
+                  />
+                </div>
+              </fieldset>
               <fieldset>
                 <label htmlFor="access_token" className="label">
                   Nylas Access Token

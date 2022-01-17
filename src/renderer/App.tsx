@@ -1,19 +1,28 @@
-import {
-  MemoryRouter as Router,
-  Routes,
-  Route,
-} from 'react-router-dom';
+import Account from 'nylas/lib/models/account';
+import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import LoginScreen from './screens/LoginScreen';
 import MessagesScreen from './screens/MessagesScreen';
+import Thread from 'nylas/lib/models/thread';
+import Message from 'nylas/lib/models/message';
 
 declare global {
   interface Window {
     electron: {
+      account: {
+        get: () => Account;
+      };
+
+      threads: {
+        get: () => Thread[];
+        getMessages: (threadId: string) => Message[];
+      };
+
       store: {
         get: (key: string) => any;
         set: (key: string, val: any) => void;
       };
+
       ipcRenderer: {
         on: any;
         once: any;
