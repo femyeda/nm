@@ -76,6 +76,7 @@ export function transformMessage(
     body: message.body,
     unread: message.unread,
     starred: message.starred,
+    conversation: message?.conversation ? message.conversation : '',
     // files: message.files,
     // events: message.events,
     labels: message.labels ? transformLabels(message.labels) : message.labels,

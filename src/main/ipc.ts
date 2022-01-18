@@ -48,7 +48,7 @@ const prepare = (app: any, window: any) => {
     event.returnValue = transformThreads(threads);
   });
 
-  ipcMain.on('get-thread-messages', async (event, threadId) => {
+  ipcMain.on('get-thread-messages', async (event, { threadId, messageIds }) => {
     const access_token = getStore().get('access_token');
     const client_id = getStore().get('client_id');
     const client_secret = getStore().get('client_secret');
@@ -59,14 +59,29 @@ const prepare = (app: any, window: any) => {
 
     const nylas = Nylas({ access_token, client_id, client_secret });
 
-    const messages: Message[] = await nylas.messages.list({
-      thread_id: threadId,
-      limit: 10,
-    });
+    const options = {
+      ignoreTables: false,
+      ignoreLinks: false,
+      ignoreImages: false,
+      removeConclusionPhrases: false,
+      imagesAsMarkdown: false,
+    };
 
-    event.returnValue = transformMessages(messages).sort((a, b) => {
-      return +new Date(a.date) - +new Date(b.date);
-    });
+    try {
+      const messages: Message[] = messageIds
+        ? await nylas.neural.cleanConversation(messageIds, options)
+        : await nylas.messages.list({
+            thread_id: threadId,
+            limit: 10,
+          });
+
+      event.returnValue = transformMessages(messages).sort((a, b) => {
+        return +new Date(a.date) - +new Date(b.date);
+      });
+    } catch (error) {
+      console.error(error);
+      event.returnValue = [];
+    }
   });
 
   ipcMain.on('electron-store-get', async (event, val) => {

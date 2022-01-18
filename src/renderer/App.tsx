@@ -15,7 +15,13 @@ declare global {
 
       threads: {
         get: () => Thread[];
-        getMessages: (threadId: string) => Message[];
+        getMessages: ({
+          threadId,
+          messageIds,
+        }: {
+          threadId?: string;
+          messageIds?: string[];
+        }) => Message[];
       };
 
       store: {

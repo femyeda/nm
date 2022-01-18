@@ -19,9 +19,9 @@ export default function MessagesScreen() {
   const [account, setAccount] = React.useState<NylasAccount>();
   const [threads, setThreads] = React.useState<NylasThread[]>();
   const [currentThread, setCurrentThread] = React.useState<string>('');
-  const [threadMessages, setThreadMessages] = React.useState<NylasMessage[]>(
-    []
-  );
+  const [threadMessages, setThreadMessages] = React.useState<
+    (NylasMessage & { conversation?: string })[]
+  >([]);
 
   React.useEffect(() => {
     const loggedIn = window.electron.store.get('access_token');
@@ -47,7 +47,10 @@ export default function MessagesScreen() {
       return;
     }
 
-    const messages = window.electron.threads.getMessages(currentThread);
+    const messageIds = threads?.find((t) => t.id === currentThread)?.messageIds;
+    const messages = window.electron.threads.getMessages({
+      messageIds: messageIds,
+    });
     setThreadMessages(messages);
   }, [currentThread]);
 
@@ -91,7 +94,7 @@ export default function MessagesScreen() {
   };
 
   const Thread = ({ thread }: { thread: NylasThread | undefined }) => {
-    if (!thread) {
+    if (!thread || !threadMessages) {
       return null;
     }
 
@@ -143,7 +146,11 @@ export default function MessagesScreen() {
     );
   };
 
-  const Message = ({ message }: { message: NylasMessage | undefined }) => {
+  const Message = ({
+    message,
+  }: {
+    message: (NylasMessage & { conversation?: string }) | undefined;
+  }) => {
     const isFromMe =
       account?.emailAddress &&
       message?.from?.map((p) => p.email).includes(account?.emailAddress);
@@ -152,7 +159,7 @@ export default function MessagesScreen() {
       <div
         className={classNames('message', isFromMe ? 'from-me' : 'from-them')}
       >
-        {message?.snippet}
+        {message?.conversation ?? message?.snippet}
       </div>
     );
   };

@@ -10,8 +10,8 @@ contextBridge.exposeInMainWorld('electron', {
     get() {
       return ipcRenderer.sendSync('get-threads')
     },
-    getMessages(threadId) {
-      return ipcRenderer.sendSync('get-thread-messages', threadId)
+    getMessages({threadId, messageIds}) {
+      return ipcRenderer.sendSync('get-thread-messages', {threadId, messageIds})
     }
   },
   store: {

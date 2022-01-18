@@ -63,6 +63,10 @@ body,
   @apply inline-flex items-center text-gray-800;
 }
 
+.messages-screen-main .content {
+  @apply min-w-0 flex-1 h-full flex flex-col overflow-y-auto;
+}
+
 .thread {
   @apply h-full pl-3;
   @apply relative;
@@ -72,10 +76,12 @@ body,
 .messages {
   background-color: #fff;
   display: flex;
-  flex-direction: column;
   font-size: 1.25rem;
   margin: 0 auto 1rem;
   padding: 0.5rem 1.5rem;
+  @apply flex-col-reverse;
+  @apply h-full;
+  @apply overflow-y-scroll;
   @apply absolute bottom-2;
 }
 
@@ -523,6 +529,4 @@ fieldset {
   @apply min-w-0 flex-1 border-t border-gray-200 lg:flex;
 }
 
-.messages-screen-main .content {
-  @apply min-w-0 flex-1 h-full flex flex-col overflow-y-auto lg:order-last;
-}
+
