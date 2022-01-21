@@ -1,9 +1,13 @@
 const { ipcMain } = require('electron');
 import { getStore, set, get } from './store';
-import Nylas from './nylas';
+import Nylas, {
+  transformThreads,
+  transformMessages,
+  transformMessage,
+} from './nylas';
 import Thread from 'nylas/lib/models/thread';
 import Message from 'nylas/lib/models/message';
-import { transformThreads, transformMessages } from './nylas';
+import Draft, { DraftProperties } from 'nylas/lib/models/draft';
 
 const prepare = (app: any, window: any) => {
   ipcMain.on('get-account', async (event) => {
@@ -43,7 +47,10 @@ const prepare = (app: any, window: any) => {
 
     const nylas = Nylas({ access_token, client_id, client_secret });
 
-    const threads: Thread[] = await nylas.threads.list({ limit: 10 });
+    const threads: Thread[] = await nylas.threads.list({
+      limit: 10,
+      in: 'inbox',
+    });
 
     event.returnValue = transformThreads(threads);
   });
@@ -76,13 +83,37 @@ const prepare = (app: any, window: any) => {
           });
 
       event.returnValue = transformMessages(messages).sort((a, b) => {
-        return +new Date(a.date) - +new Date(b.date);
+        return +new Date(b.date) - +new Date(a.date);
       });
     } catch (error) {
       console.error(error);
       event.returnValue = [];
     }
   });
+
+  ipcMain.on(
+    'send-message',
+    async (event, { message }: { message: DraftProperties }) => {
+      const access_token = getStore().get('access_token');
+      const client_id = getStore().get('client_id');
+      const client_secret = getStore().get('client_secret');
+
+      if (!access_token || !client_id || !client_secret) {
+        return;
+      }
+
+      try {
+        const nylas = Nylas({ access_token, client_id, client_secret });
+
+        const draft = new Draft(nylas, message);
+
+        const sentMessage = await draft.send();
+        event.returnValue = transformMessage(sentMessage);
+      } catch (e) {
+        event.returnValue = null;
+      }
+    }
+  );
 
   ipcMain.on('electron-store-get', async (event, val) => {
     event.returnValue = get(val);

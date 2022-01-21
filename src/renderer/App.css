@@ -46,6 +46,20 @@ body,
   @apply h-8 w-8 rounded-full flex flex-col justify-center content-center items-center bg-gray-400;
 }
 
+.avatar {
+  @apply relative h-8 w-8 rounded-full flex flex-col justify-center content-center items-center;
+}
+
+.avatar .badge {
+  font-size: x-small;
+  @apply absolute;
+  @apply -top-1/4 -right-1/4;
+}
+
+.avatar .badge svg {
+  @apply w-2.5 h-2.5;
+}
+
 .account-avatar--text p,
 .thread-avatar--text p {
   @apply text-white text-sm uppercase;
@@ -77,10 +91,10 @@ body,
   background-color: #fff;
   display: flex;
   font-size: 1.25rem;
-  margin: 0 auto 1rem;
+  margin: 0 auto 0;
   padding: 0.5rem 1.5rem;
   @apply flex-col-reverse;
-  @apply h-full;
+  @apply h-full w-full;
   @apply overflow-y-scroll;
   @apply absolute bottom-2;
 }
@@ -186,6 +200,19 @@ body,
 
 .margin-t_one {
   margin-top: 1rem !important;
+}
+
+.composer {
+  @apply p-2;
+}
+
+.composer .input {
+  @apply block w-full;
+  @apply sm:text-sm ;
+  @apply border-gray-300;
+  @apply rounded-full;
+  @apply focus:outline-none;
+  @apply focus:border-gray-300;
 }
 
 .screen-container {
@@ -503,7 +530,7 @@ fieldset {
 }
 
 .messages-screen-sidebar .sidebar-items-container .sidebar-item.unread::before {
-  content: "•";
+  content: '•';
   @apply text-blue-400;
   @apply absolute;
   @apply left-0;
@@ -513,7 +540,10 @@ fieldset {
   @apply text-gray-400 hover:bg-gray-200;
 }
 
-.messages-screen-sidebar .sidebar-items-container .sidebar-item span {
+.messages-screen-sidebar
+  .sidebar-items-container
+  .sidebar-item
+  span:not(.badge) {
   @apply sr-only;
 }
 
@@ -528,5 +558,3 @@ fieldset {
 .messages-screen-main {
   @apply min-w-0 flex-1 border-t border-gray-200 lg:flex;
 }
-
-

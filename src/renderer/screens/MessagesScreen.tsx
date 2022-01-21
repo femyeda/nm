@@ -6,7 +6,8 @@ import NylasAccount from 'nylas/lib/models/account';
 import NylasThread from 'nylas/lib/models/thread';
 import NylasMessage from 'nylas/lib/models/message';
 import NylasParticipant from 'nylas/lib/models/email-participant';
-import { PencilAltIcon } from '@heroicons/react/outline';
+import { PencilAltIcon, UserCircleIcon } from '@heroicons/react/outline';
+import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 
 const userNavigation = [
   { name: 'Your Profile', href: '#' },
@@ -22,6 +23,7 @@ export default function MessagesScreen() {
   const [threadMessages, setThreadMessages] = React.useState<
     (NylasMessage & { conversation?: string })[]
   >([]);
+  const [activeDraft, setActiveDraft] = React.useState(false);
 
   React.useEffect(() => {
     const loggedIn = window.electron.store.get('access_token');
@@ -43,7 +45,13 @@ export default function MessagesScreen() {
   }, []);
 
   React.useEffect(() => {
-    if (!currentThread) {
+    if (
+      !currentThread ||
+      currentThread === 'activeDraft' ||
+      currentThread === 'firstTimeSenders' ||
+      currentThread === 'replyLater' ||
+      currentThread === 'setAside'
+    ) {
       return;
     }
 
@@ -54,10 +62,6 @@ export default function MessagesScreen() {
     setThreadMessages(messages);
   }, [currentThread]);
 
-  const handleThreadClick = (threadId: string) => {
-    setCurrentThread(threadId);
-  };
-
   const Sidebar = () => {
     if (!threads || threads.length === 0 || !account) {
       return null;
@@ -66,6 +70,42 @@ export default function MessagesScreen() {
     return (
       <nav aria-label="Sidebar" className="messages-screen-sidebar">
         <div className="sidebar-items-container">
+          {activeDraft && (
+            <div
+              onClick={handleActiveDraftClick}
+              className={classNames(
+                currentThread === 'activeDraft' ? 'active' : '',
+                'sidebar-item'
+              )}
+            >
+              <span>activeDraft</span>
+              <div className="avatar">
+                <button
+                  onClick={handleActiveDraftCloseClick}
+                  data-id="close"
+                  className="badge"
+                >
+                  <svg
+                    data-id="close"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      data-id="close"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+                <UserCircleIcon />
+              </div>
+            </div>
+          )}
+
           {threads.map((thread) => {
             const participants = thread.participants.filter(
               (participant) => participant.email != account.emailAddress
@@ -159,14 +199,144 @@ export default function MessagesScreen() {
       <div
         className={classNames('message', isFromMe ? 'from-me' : 'from-them')}
       >
-        {message?.conversation ?? message?.snippet}
+        {message?.conversation || message?.snippet}
       </div>
     );
   };
 
-  const handleNewMessageClick = () => {
-    console.log('TODO handleNewMessageClick');
+  const handleThreadClick = (threadId: string) => {
+    setCurrentThread(threadId);
   };
+
+  const handleNewMessageClick = () => {
+    setActiveDraft(true);
+    setCurrentThread('activeDraft');
+  };
+
+  const handleActiveDraftClick = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    if (e.currentTarget.getAttribute('data-id') === 'close') {
+      e.stopPropagation();
+      return;
+    }
+
+    setCurrentThread('activeDraft');
+  };
+
+  const handleActiveDraftCloseClick = () => {
+    const firstThreadId = (threads && threads[0]?.id) || '';
+    setCurrentThread(firstThreadId);
+    setActiveDraft(false);
+  };
+
+  const afterSendSuccess = ({
+    message,
+    threadId,
+  }: {
+    message: NylasMessage | null;
+    threadId?: string;
+  }) => {
+    if (threadId && message) {
+      setThreadMessages([message, ...threadMessages]);
+    }
+  };
+
+  type ComposerProps = {
+    onSend?: ({
+      message,
+      threadId,
+    }: {
+      message: NylasMessage | null;
+      threadId?: string;
+    }) => void;
+    thread?: NylasThread;
+  };
+
+  const Composer = (props: ComposerProps) => {
+    const ref = React.createRef<HTMLElement>();
+    const [message, setMessage] = React.useState({ html: '' });
+
+    const reset = () => {
+      setMessage({ html: '' });
+    };
+
+    const sendMessage = (content: string): NylasMessage | null => {
+      if (!props.thread || !account) {
+        return null;
+      }
+
+      const participants = props?.thread?.participants.filter(
+        (participant) => participant.email != account.emailAddress
+      );
+
+      try {
+        const m = window.electron.drafts.send({
+          message: {
+            to: participants,
+            threadId: props?.thread.id,
+            subject: props?.thread.subject,
+            body: content,
+          },
+        });
+
+        reset();
+        return m;
+      } catch (e) {
+        console.log(e);
+        return null;
+      }
+    };
+
+    const onSend = (content: string) => {
+      const message = sendMessage(content);
+      props?.onSend && props.onSend({ message, threadId: props?.thread?.id });
+    };
+
+    const onChange = (e: ContentEditableEvent) => {
+      setMessage({
+        html: e.target.value,
+      });
+    };
+
+    const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === 'Enter' && e.metaKey) {
+        onSend(message.html);
+      }
+    };
+
+    return (
+      <div className="composer">
+        <ContentEditable
+          innerRef={ref}
+          html={message.html}
+          disabled={false}
+          onKeyDown={onKeyDown}
+          onChange={onChange}
+          className="input"
+        />
+      </div>
+    );
+  };
+
+  const RenderMain = React.useCallback(() => {
+    if (!currentThread) {
+      return null;
+    }
+
+    if (currentThread === 'activeDraft') {
+      return <p>TODO: active draft compose a message</p>;
+    }
+
+    const thread = threads?.find((t) => t.id === currentThread);
+
+    return (
+      <>
+        <Thread thread={thread} />
+        <Composer onSend={afterSendSuccess} thread={thread} />
+      </>
+    );
+  }, [currentThread, threadMessages]);
 
   return (
     <>
@@ -251,7 +421,7 @@ export default function MessagesScreen() {
             {/* Primary column */}
             <section aria-labelledby="primary-heading" className="content">
               {/* Your content */}
-              <Thread thread={threads?.find((t) => t.id === currentThread)} />
+              <RenderMain />
             </section>
           </main>
         </div>

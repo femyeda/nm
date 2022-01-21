@@ -5,12 +5,17 @@ import LoginScreen from './screens/LoginScreen';
 import MessagesScreen from './screens/MessagesScreen';
 import Thread from 'nylas/lib/models/thread';
 import Message from 'nylas/lib/models/message';
+import { DraftProperties } from 'nylas/lib/models/draft';
 
 declare global {
   interface Window {
     electron: {
       account: {
         get: () => Account;
+      };
+
+      drafts: {
+        send: ({ message }: { message: DraftProperties }) => Message;
       };
 
       threads: {

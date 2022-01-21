@@ -6,13 +6,21 @@ contextBridge.exposeInMainWorld('electron', {
       return ipcRenderer.sendSync('get-account');
     },
   },
+  drafts: {
+    send({ message }) {
+      return ipcRenderer.sendSync('send-message', { message });
+    },
+  },
   threads: {
     get() {
-      return ipcRenderer.sendSync('get-threads')
+      return ipcRenderer.sendSync('get-threads');
     },
-    getMessages({threadId, messageIds}) {
-      return ipcRenderer.sendSync('get-thread-messages', {threadId, messageIds})
-    }
+    getMessages({ threadId, messageIds }) {
+      return ipcRenderer.sendSync('get-thread-messages', {
+        threadId,
+        messageIds,
+      });
+    },
   },
   store: {
     get(val) {
