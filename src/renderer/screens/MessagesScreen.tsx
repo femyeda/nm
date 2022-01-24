@@ -5,9 +5,16 @@ import classNames from 'classnames';
 import NylasAccount from 'nylas/lib/models/account';
 import NylasThread from 'nylas/lib/models/thread';
 import NylasMessage from 'nylas/lib/models/message';
-import NylasParticipant from 'nylas/lib/models/email-participant';
+import NylasParticipant, {
+  EmailParticipantProperties,
+} from 'nylas/lib/models/email-participant';
 import { PencilAltIcon, UserCircleIcon } from '@heroicons/react/outline';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
+import { ReactMultiEmail, isEmail } from 'react-multi-email';
+import 'react-multi-email/style.css';
+import { DraftProperties } from 'nylas/lib/models/draft';
+import uniqBy from 'lodash.uniqby';
+import isEqual from 'lodash.isequal';
 
 const userNavigation = [
   { name: 'Your Profile', href: '#' },
@@ -24,6 +31,7 @@ export default function MessagesScreen() {
     (NylasMessage & { conversation?: string })[]
   >([]);
   const [activeDraft, setActiveDraft] = React.useState(false);
+  const [activeDraftTo, setActiveDraftTo] = React.useState<string[]>([]);
 
   React.useEffect(() => {
     const loggedIn = window.electron.store.get('access_token');
@@ -141,8 +149,19 @@ export default function MessagesScreen() {
     return (
       <div className="thread">
         <div className="messages">
-          {threadMessages.map((message) => {
-            return <Message key={message.id} message={message} />;
+          {threadMessages.map((message, index) => {
+            const consecutive =
+              index > 1
+                ? isEqual(threadMessages[index - 1]?.from, message.from)
+                : false;
+
+            return (
+              <Message
+                key={message.id}
+                message={message}
+                consecutive={consecutive}
+              />
+            );
           })}
         </div>
       </div>
@@ -158,8 +177,13 @@ export default function MessagesScreen() {
       return null;
     }
 
-    const participants = thread.participants.filter(
-      (participant) => participant.email != account.emailAddress
+    const participants = uniqBy(
+      thread.participants.filter(
+        (participant) => participant.email != account.emailAddress
+      ),
+      (participant) => {
+        return participant.email;
+      }
     );
 
     const Participant = ({
@@ -188,8 +212,10 @@ export default function MessagesScreen() {
 
   const Message = ({
     message,
+    consecutive = false,
   }: {
     message: (NylasMessage & { conversation?: string }) | undefined;
+    consecutive?: boolean;
   }) => {
     const isFromMe =
       account?.emailAddress &&
@@ -197,7 +223,11 @@ export default function MessagesScreen() {
 
     return (
       <div
-        className={classNames('message', isFromMe ? 'from-me' : 'from-them')}
+        className={classNames(
+          'message',
+          isFromMe ? 'from-me' : 'from-them',
+          consecutive && 'no-tail'
+        )}
       >
         {message?.conversation || message?.snippet}
       </div>
@@ -216,7 +246,7 @@ export default function MessagesScreen() {
   const handleActiveDraftClick = (
     e: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
-    if (e.currentTarget.getAttribute('data-id') === 'close') {
+    if (e.target.getAttribute('data-id') === 'close') {
       e.stopPropagation();
       return;
     }
@@ -228,6 +258,7 @@ export default function MessagesScreen() {
     const firstThreadId = (threads && threads[0]?.id) || '';
     setCurrentThread(firstThreadId);
     setActiveDraft(false);
+    setActiveDraftTo([]);
   };
 
   const afterSendSuccess = ({
@@ -240,6 +271,9 @@ export default function MessagesScreen() {
     if (threadId && message) {
       setThreadMessages([message, ...threadMessages]);
     }
+    if (currentThread === 'activeDraft') {
+      setActiveDraftTo([]);
+    }
   };
 
   type ComposerProps = {
@@ -251,33 +285,51 @@ export default function MessagesScreen() {
       threadId?: string;
     }) => void;
     thread?: NylasThread;
+    to?: EmailParticipantProperties[];
   };
 
   const Composer = (props: ComposerProps) => {
     const ref = React.createRef<HTMLElement>();
     const [message, setMessage] = React.useState({ html: '' });
+    const [subject, setSubject] = React.useState('');
 
     const reset = () => {
+      setSubject('');
       setMessage({ html: '' });
     };
 
-    const sendMessage = (content: string): NylasMessage | null => {
-      if (!props.thread || !account) {
+    const sendMessage = (
+      content: string,
+      subject?: string
+    ): NylasMessage | null => {
+      if (!props.thread && !props.to) {
         return null;
       }
 
-      const participants = props?.thread?.participants.filter(
-        (participant) => participant.email != account.emailAddress
-      );
+      if (!account) {
+        return null;
+      }
+
+      let message: any = {};
+
+      if (props.thread) {
+        message.to = props?.thread?.participants.filter(
+          (participant) => participant.email != account.emailAddress
+        );
+        message.threadId = props?.thread.id;
+        message.subject = props?.thread.subject;
+      }
+
+      if (props.to) {
+        message.subject = subject;
+        message.to = props.to;
+      }
+
+      message.body = content;
 
       try {
         const m = window.electron.drafts.send({
-          message: {
-            to: participants,
-            threadId: props?.thread.id,
-            subject: props?.thread.subject,
-            body: content,
-          },
+          message: message as DraftProperties,
         });
 
         reset();
@@ -288,8 +340,8 @@ export default function MessagesScreen() {
       }
     };
 
-    const onSend = (content: string) => {
-      const message = sendMessage(content);
+    const onSend = (content: string, subject: string) => {
+      const message = sendMessage(content, subject);
       props?.onSend && props.onSend({ message, threadId: props?.thread?.id });
     };
 
@@ -301,13 +353,22 @@ export default function MessagesScreen() {
 
     const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (e.key === 'Enter' && e.metaKey) {
-        onSend(message.html);
+        onSend(message.html, subject);
       }
     };
 
     return (
       <div className="composer">
+        {!props.thread && (
+          <input
+            className="input"
+            placeholder="subject"
+            value={subject}
+            onChange={(e) => setSubject(e.target.value)}
+          />
+        )}
         <ContentEditable
+          placeholder="message"
           innerRef={ref}
           html={message.html}
           disabled={false}
@@ -325,7 +386,19 @@ export default function MessagesScreen() {
     }
 
     if (currentThread === 'activeDraft') {
-      return <p>TODO: active draft compose a message</p>;
+      return (
+        <>
+          <div className="thread"></div>
+          <Composer
+            to={activeDraftTo.map((email) => {
+              return {
+                email: email,
+              } as NylasParticipant;
+            })}
+            onSend={afterSendSuccess}
+          />
+        </>
+      );
     }
 
     const thread = threads?.find((t) => t.id === currentThread);
@@ -336,7 +409,7 @@ export default function MessagesScreen() {
         <Composer onSend={afterSendSuccess} thread={thread} />
       </>
     );
-  }, [currentThread, threadMessages]);
+  }, [currentThread, threadMessages, activeDraftTo]);
 
   return (
     <>
@@ -356,9 +429,41 @@ export default function MessagesScreen() {
             <div className="left">
               <div className="">
                 <div className="icon-container">
-                  <ThreadParticipants
-                    thread={threads?.find((t) => t.id === currentThread)}
-                  />
+                  {activeDraft && currentThread === 'activeDraft' ? (
+                    <>
+                      To:{' '}
+                      <ReactMultiEmail
+                        emails={activeDraftTo}
+                        onChange={(emails) => {
+                          setActiveDraftTo(emails);
+                        }}
+                        validateEmail={(email) => {
+                          return isEmail(email);
+                        }}
+                        getLabel={(
+                          email: string,
+                          index: number,
+                          removeEmail: (index: number) => void
+                        ) => {
+                          return (
+                            <div data-tag key={index}>
+                              {email}
+                              <span
+                                data-tag-handle
+                                onClick={() => removeEmail(index)}
+                              >
+                                ×
+                              </span>
+                            </div>
+                          );
+                        }}
+                      />
+                    </>
+                  ) : (
+                    <ThreadParticipants
+                      thread={threads?.find((t) => t.id === currentThread)}
+                    />
+                  )}
                 </div>
               </div>
             </div>

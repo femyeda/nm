@@ -208,7 +208,7 @@ body,
 
 .composer .input {
   @apply block w-full;
-  @apply sm:text-sm ;
+  @apply sm:text-sm;
   @apply border-gray-300;
   @apply rounded-full;
   @apply focus:outline-none;
@@ -263,8 +263,25 @@ fieldset {
   @apply space-y-1;
 }
 
-.input {
-  @apply appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm;
+.react-multi-email {
+  @apply bg-transparent !important;
+  @apply border-none !important;
+}
+
+.react-multi-email.focused {
+  @apply bg-transparent !important;
+}
+
+.input, .react-multi-email input {
+  @apply appearance-none;
+  @apply bg-transparent;
+  @apply block w-full;
+  @apply px-3 py-2;
+  @apply border border-gray-300;
+  @apply rounded-md placeholder-gray-400 ;
+  @apply focus:outline-none focus:ring-indigo-500 focus:border-indigo-500;
+  @apply sm:text-sm;
+  @apply placeholder:text-gray-400;
 }
 
 .button {
@@ -332,14 +349,14 @@ fieldset {
 }
 
 .messages-screen-header .desktop-nav-container .left:first-child input {
-  @apply block w-full border-transparent pl-12 placeholder-gray-500 focus:border-transparent sm:text-sm focus:ring-0;
+  @apply block w-full border-transparent placeholder-gray-500 focus:border-transparent sm:text-sm focus:ring-0;
 }
 
 .messages-screen-header
   .desktop-nav-container
   .left:first-child
   .icon-container {
-  @apply pointer-events-none absolute inset-y-0 left-0 flex items-center justify-center pl-4;
+  @apply absolute inset-y-0 left-0 flex items-center justify-center pl-2;
 }
 
 .messages-screen-header
