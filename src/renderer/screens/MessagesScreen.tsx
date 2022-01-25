@@ -63,6 +63,8 @@ export default function MessagesScreen() {
       return;
     }
 
+    console.log(threads?.find((t) => t.id === currentThread));
+
     const messageIds = threads?.find((t) => t.id === currentThread)?.messageIds;
     const messages = window.electron.threads.getMessages({
       messageIds: messageIds,
@@ -271,9 +273,33 @@ export default function MessagesScreen() {
     if (threadId && message) {
       setThreadMessages([message, ...threadMessages]);
     }
+
     if (currentThread === 'activeDraft') {
       setActiveDraftTo([]);
+      afterNewMessage(message);
     }
+  };
+
+  const afterNewMessage = (message: NylasMessage | null) => {
+    if (!message || !message?.id || !message?.threadId) {
+      return;
+    }
+
+    if (threads) {
+      setThreads([
+        {
+          id: message.threadId,
+          messageIds: [message.id],
+          subject: message?.subject || '',
+          participants: message.to,
+        },
+        ...threads,
+      ]);
+    }
+
+    setCurrentThread(message.threadId);
+    setThreadMessages([message]);
+    setActiveDraft(false);
   };
 
   type ComposerProps = {

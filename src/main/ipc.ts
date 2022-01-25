@@ -49,7 +49,7 @@ const prepare = (app: any, window: any) => {
 
     const threads: Thread[] = await nylas.threads.list({
       limit: 10,
-      in: 'inbox',
+      not_in: ['drafts', 'trash', 'spam', 'archive'],
     });
 
     event.returnValue = transformThreads(threads);
