@@ -12,6 +12,10 @@ import {
   ChevronDoubleRightIcon,
   PencilAltIcon,
   UserCircleIcon,
+  ReplyIcon,
+  PaperClipIcon,
+  ThumbDownIcon,
+  XIcon,
 } from '@heroicons/react/outline';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { ReactMultiEmail, isEmail } from 'react-multi-email';
@@ -104,33 +108,162 @@ export default function MessagesScreen() {
                   'sidebar-item'
                 )}
               >
-                <span>activeDraft</span>
-                <div className="avatar">
-                  <button
-                    onClick={handleActiveDraftCloseClick}
-                    data-id="close"
-                    className="badge"
-                  >
-                    <svg
+                {sidebarExpanded ? (
+                  <div className="thread-item">
+                    <div className="avatar-container">
+                      <div className="avatar">
+                        <UserCircleIcon />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="title">New Message</p>
+
+                      {/* <p className="snippet">{thread?.snippet.slice(0, 99)}</p> */}
+                    </div>
+                    <button
+                      onClick={handleActiveDraftCloseClick}
                       data-id="close"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
+                      className="badge w-2 h-2"
                     >
-                      <path
+                      <svg
                         data-id="close"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                  <UserCircleIcon />
-                </div>
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          data-id="close"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <span>activeDraft</span>
+                    <div className="avatar">
+                      <button
+                        onClick={handleActiveDraftCloseClick}
+                        data-id="close"
+                        className="badge"
+                      >
+                        <svg
+                          data-id="close"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            data-id="close"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+
+                      <UserCircleIcon />
+                    </div>
+                  </>
+                )}
               </div>
             )}
+
+            <a
+              onClick={() => setCurrentThread('firstTimeSenders')}
+              className={classNames(
+                currentThread === 'firstTimeSenders' ? 'active' : '',
+                'sidebar-item'
+              )}
+            >
+              {sidebarExpanded ? (
+                <div className="thread-item">
+                  <div className="avatar-container">
+                    <div className="avatar">
+                      <span className="badge">12</span>
+                      <ThumbDownIcon />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="title">First Time Senders</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <span>firstTimeSenders</span>
+                  <div className="avatar">
+                    <span className="badge">12</span>
+                    <ThumbDownIcon />
+                  </div>
+                </>
+              )}
+            </a>
+
+            <a
+              onClick={() => setCurrentThread('replyLater')}
+              className={classNames(
+                currentThread === 'replyLater' ? 'active' : '',
+                'sidebar-item'
+              )}
+            >
+              {sidebarExpanded ? (
+                <div className="thread-item">
+                  <div className="avatar-container">
+                    <div className="avatar">
+                      <span className="badge">2</span>
+                      <ReplyIcon />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="title">Reply Later</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <span>replyLater</span>
+                  <div className="avatar">
+                    <span className="badge">2</span>
+                    <ReplyIcon />
+                  </div>
+                </>
+              )}
+            </a>
+
+            <a
+              onClick={() => setCurrentThread('setAside')}
+              className={classNames(
+                currentThread === 'setAside' ? 'active' : '',
+                'sidebar-item'
+              )}
+            >
+              {sidebarExpanded ? (
+                <div className="thread-item">
+                  <div className="avatar-container">
+                    <div className="avatar">
+                      <span className="badge">4</span>
+                      <PaperClipIcon />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="title">Set Aside</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <span>setAside</span>
+                  <div className="avatar">
+                    <span className="badge">4</span>
+                    <PaperClipIcon />
+                  </div>
+                </>
+              )}
+            </a>
 
             {threads.map((thread) => {
               const participants = thread.participants.filter(
@@ -477,6 +610,22 @@ export default function MessagesScreen() {
           />
         </>
       );
+    }
+
+    if (activeDraft && currentThread === 'activeDraft') {
+      return <p>active draft compose a message</p>;
+    }
+
+    if (!currentThread) {
+      return <p>nothing to show</p>;
+    }
+
+    if (
+      currentThread === 'firstTimeSenders' ||
+      currentThread === 'replyLater' ||
+      currentThread === 'setAside'
+    ) {
+      return <p>{currentThread}</p>;
     }
 
     const thread = threads?.find((t) => t.id === currentThread);

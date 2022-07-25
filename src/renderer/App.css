@@ -55,6 +55,16 @@ body,
   @apply relative h-8 w-8 rounded-full flex flex-col justify-center content-center items-center;
 }
 
+.badge {
+  font-size: x-small;
+  @apply absolute;
+  @apply top-0 right-2;
+}
+
+.badge svg {
+  @apply w-2.5 h-2.5;
+}
+
 .avatar .badge {
   font-size: x-small;
   @apply absolute;
@@ -575,6 +585,7 @@ fieldset {
   @apply w-full;
   @apply flex;
   @apply space-x-4;
+  @apply relative;
 }
 
 .thread-item .avatar-container {
@@ -595,7 +606,10 @@ fieldset {
   @apply flex-grow inline-flex items-center justify-between;
 }
 
-.messages-screen-sidebar.expanded .sidebar-items-container .sidebar-item.active .title{
+.messages-screen-sidebar.expanded
+  .sidebar-items-container
+  .sidebar-item.active
+  .title {
   @apply text-white;
 }
 
@@ -611,7 +625,7 @@ fieldset {
 
 .messages-screen-sidebar .sidebar-items-container .sidebar-item.active {
   background-color: #248bf5;
-  @apply  text-white;
+  @apply text-white;
 }
 
 .messages-screen-sidebar .sidebar-items-container .sidebar-item.unread::before {
