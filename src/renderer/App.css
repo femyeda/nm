@@ -7,12 +7,18 @@
 @tailwind components;
 @tailwind utilities;
 
-.hello {
-  @apply absolute inset-0 bg-white text-center h-full flex flex-col justify-center;
+::-webkit-scrollbar {
+  @apply w-2;
+  @apply h-2;
 }
 
-.title {
-  @apply text-lg leading-6 font-medium text-gray-900;
+::-webkit-scrollbar-track {
+  @apply rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400;
+  @apply rounded-full;
 }
 
 html,
@@ -39,7 +45,6 @@ body,
 }
 
 .account-avatar--text {
-  @apply h-8 w-8 rounded-full flex flex-col justify-center content-center items-center bg-blue-400;
 }
 
 .thread-avatar--text {
@@ -75,10 +80,6 @@ body,
 
 .thread-participant {
   @apply inline-flex items-center text-gray-800;
-}
-
-.messages-screen-main .content {
-  @apply min-w-0 flex-1 h-full flex flex-col overflow-y-auto;
 }
 
 .thread {
@@ -272,13 +273,14 @@ fieldset {
   @apply bg-transparent !important;
 }
 
-.input, .react-multi-email input {
+.input,
+.react-multi-email input {
   @apply appearance-none;
   @apply bg-transparent;
   @apply block w-full;
   @apply px-3 py-2;
   @apply border border-gray-300;
-  @apply rounded-md placeholder-gray-400 ;
+  @apply rounded-md placeholder-gray-400;
   @apply focus:outline-none focus:ring-indigo-500 focus:border-indigo-500;
   @apply sm:text-sm;
   @apply placeholder:text-gray-400;
@@ -297,16 +299,27 @@ fieldset {
 }
 
 .messages-screen-header {
-  @apply flex-shrink-0 relative h-16 bg-white flex items-center;
+  @apply flex-shrink-0 relative h-16 flex items-center;
+  @apply bg-gray-50;
 }
 
 .messages-screen-header-logo-container {
   @apply inset-y-0 left-0 static flex-shrink-0;
 }
 
+.messages-screen-header-logo-container.expanded {
+  @apply w-1/3;
+  @apply max-w-sm;
+  @apply bg-gray-100;
+  @apply flex justify-between;
+}
+
 .messages-screen-header-logo-container a,
 .messages-screen-header-logo-container div {
-  @apply flex items-center justify-center h-16 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-600 w-20;
+  @apply flex items-center justify-center;
+  @apply h-16 w-24;
+  @apply bg-gray-100;
+  @apply focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-600;
 }
 
 .messages-screen-header-logo-container a img {
@@ -530,25 +543,80 @@ fieldset {
 }
 
 .messages-screen-sidebar {
-  @apply block flex-shrink-0 bg-gray-100 overflow-y-auto;
+  @apply block flex-shrink-0 bg-gray-100;
+}
+
+.messages-screen-sidebar.expanded {
+  @apply w-1/3;
+  @apply max-w-sm;
+}
+
+.sidebar-action-container {
+  position: fixed;
+  top: 4em;
+  z-index: 100;
+  height: 4em;
 }
 
 .messages-screen-sidebar .sidebar-items-container {
   @apply relative w-20 flex flex-col p-3 space-y-3;
+  @apply top-16;
+  @apply w-full h-full;
+  @apply overflow-y-scroll;
 }
 
 .messages-screen-sidebar .sidebar-items-container .sidebar-item {
-  @apply flex-shrink-0 inline-flex items-center justify-center h-14 w-14 rounded-lg;
+  @apply h-16 w-16;
+  @apply flex-shrink-0 inline-flex items-center justify-center rounded-md;
   @apply relative;
 }
 
+.thread-item {
+  @apply w-full;
+  @apply flex;
+  @apply space-x-4;
+}
+
+.thread-item .avatar-container {
+  align-self: center;
+}
+
+.thread-item .snippet {
+  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* number of lines to show */
+  -webkit-box-orient: vertical;
+}
+
+.messages-screen-sidebar.expanded .sidebar-items-container .sidebar-item {
+  @apply w-full h-20;
+  @apply flex-grow inline-flex items-center justify-between;
+}
+
+.messages-screen-sidebar.expanded .sidebar-items-container .sidebar-item.active .title{
+  @apply text-white;
+}
+
+.title {
+  @apply font-medium;
+  @apply text-gray-700;
+}
+
+.snippet {
+  @apply font-thin;
+  @apply text-sm;
+}
+
 .messages-screen-sidebar .sidebar-items-container .sidebar-item.active {
-  @apply bg-blue-400 text-white;
+  background-color: #248bf5;
+  @apply  text-white;
 }
 
 .messages-screen-sidebar .sidebar-items-container .sidebar-item.unread::before {
   content: '•';
-  @apply text-blue-400;
+  color: #248bf5;
   @apply absolute;
   @apply left-0;
 }
@@ -574,4 +642,9 @@ fieldset {
 
 .messages-screen-main {
   @apply min-w-0 flex-1 border-t border-gray-200 lg:flex;
+}
+
+.messages-screen-main .content {
+  @apply min-w-0 flex-1 h-full flex flex-col overflow-y-auto;
+  @apply overflow-x-hidden;
 }

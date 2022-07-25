@@ -48,7 +48,7 @@ const prepare = (app: any, window: any) => {
     const nylas = Nylas({ access_token, client_id, client_secret });
 
     const threads: Thread[] = await nylas.threads.list({
-      limit: 10,
+      limit: 7,
       not_in: ['drafts', 'trash', 'spam', 'archive'],
     });
 

@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router';
-import React, { Fragment } from 'react';
-import { Menu, Transition } from '@headlessui/react';
+import React from 'react';
 import classNames from 'classnames';
 import NylasAccount from 'nylas/lib/models/account';
 import NylasThread from 'nylas/lib/models/thread';
@@ -8,18 +7,18 @@ import NylasMessage from 'nylas/lib/models/message';
 import NylasParticipant, {
   EmailParticipantProperties,
 } from 'nylas/lib/models/email-participant';
-import { PencilAltIcon, UserCircleIcon } from '@heroicons/react/outline';
+import {
+  ChevronDoubleLeftIcon,
+  ChevronDoubleRightIcon,
+  PencilAltIcon,
+  UserCircleIcon,
+} from '@heroicons/react/outline';
 import ContentEditable, { ContentEditableEvent } from 'react-contenteditable';
 import { ReactMultiEmail, isEmail } from 'react-multi-email';
 import 'react-multi-email/style.css';
 import { DraftProperties } from 'nylas/lib/models/draft';
 import uniqBy from 'lodash.uniqby';
 import isEqual from 'lodash.isequal';
-
-const userNavigation = [
-  { name: 'Your Profile', href: '#' },
-  { name: 'Sign out', href: '#' },
-];
 
 export default function MessagesScreen() {
   const navigate = useNavigate();
@@ -32,6 +31,7 @@ export default function MessagesScreen() {
   >([]);
   const [activeDraft, setActiveDraft] = React.useState(false);
   const [activeDraftTo, setActiveDraftTo] = React.useState<string[]>([]);
+  const [sidebarExpanded, setSidebarExpanded] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     const loggedIn = window.electron.store.get('access_token');
@@ -63,8 +63,6 @@ export default function MessagesScreen() {
       return;
     }
 
-    console.log(threads?.find((t) => t.id === currentThread));
-
     const messageIds = threads?.find((t) => t.id === currentThread)?.messageIds;
     const messages = window.electron.threads.getMessages({
       messageIds: messageIds,
@@ -78,68 +76,107 @@ export default function MessagesScreen() {
     }
 
     return (
-      <nav aria-label="Sidebar" className="messages-screen-sidebar">
-        <div className="sidebar-items-container">
-          {activeDraft && (
-            <div
-              onClick={handleActiveDraftClick}
-              className={classNames(
-                currentThread === 'activeDraft' ? 'active' : '',
-                'sidebar-item'
-              )}
-            >
-              <span>activeDraft</span>
-              <div className="avatar">
-                <button
-                  onClick={handleActiveDraftCloseClick}
-                  data-id="close"
-                  className="badge"
-                >
-                  <svg
-                    data-id="close"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      data-id="close"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                </button>
-                <UserCircleIcon />
-              </div>
-            </div>
+      <>
+        <nav
+          aria-label="Sidebar"
+          className={classNames(
+            'messages-screen-sidebar',
+            sidebarExpanded && 'expanded'
           )}
-
-          {threads.map((thread) => {
-            const participants = thread.participants.filter(
-              (participant) => participant.email != account.emailAddress
-            );
-
-            return (
-              <a
-                key={thread.id}
-                onClick={() => handleThreadClick(thread.id || '')}
+        >
+          <div className="messages-screen-header-logo-container sidebar-action-container">
+            {sidebarExpanded ? (
+              <div>search</div>
+            ) : (
+              <div>
+                <button onClick={handleNewMessageClick}>
+                  <PencilAltIcon className="icon icon--small icon--gray" />
+                </button>
+              </div>
+            )}
+          </div>
+          <div className="sidebar-items-container">
+            {activeDraft && (
+              <div
+                onClick={handleActiveDraftClick}
                 className={classNames(
-                  thread.id === currentThread ? 'active' : '',
-                  thread?.unread && 'unread',
+                  currentThread === 'activeDraft' ? 'active' : '',
                   'sidebar-item'
                 )}
               >
-                <span>{thread.id}</span>
-                <div className="avatar thread-avatar--text">
-                  <p>{participants[0].email.slice(0, 2)}</p>
+                <span>activeDraft</span>
+                <div className="avatar">
+                  <button
+                    onClick={handleActiveDraftCloseClick}
+                    data-id="close"
+                    className="badge"
+                  >
+                    <svg
+                      data-id="close"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        data-id="close"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                  <UserCircleIcon />
                 </div>
-              </a>
-            );
-          })}
-        </div>
-      </nav>
+              </div>
+            )}
+
+            {threads.map((thread) => {
+              const participants = thread.participants.filter(
+                (participant) => participant.email != account.emailAddress
+              );
+
+              return (
+                <a
+                  key={thread.id}
+                  onClick={() => handleThreadClick(thread.id || '')}
+                  className={classNames(
+                    thread.id === currentThread ? 'active' : '',
+                    thread?.unread && 'unread',
+                    'sidebar-item'
+                  )}
+                >
+                  {sidebarExpanded ? (
+                    <div className="thread-item">
+                      <span>{thread.id}</span>
+                      <div className="avatar-container">
+                        <div className="avatar thread-avatar--text">
+                          <p>{participants[0].email.slice(0, 2)}</p>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="title">{participants[0].email}</p>
+                        <p className="snippet">
+                          {thread?.snippet.slice(0, 99)}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <span>{thread.id}</span>
+                      <div className="avatar thread-avatar--text">
+                        <p>{participants[0].email.slice(0, 2)}</p>
+                      </div>
+                    </>
+                  )}
+                </a>
+              );
+            })}
+            <div className="sidebar-item"></div>
+          </div>
+        </nav>
+      </>
     );
   };
 
@@ -223,6 +260,15 @@ export default function MessagesScreen() {
       account?.emailAddress &&
       message?.from?.map((p) => p.email).includes(account?.emailAddress);
 
+    // const frame = React.useRef();
+    // React.useEffect(() => {
+    //   if (!frame) {
+    //     return
+    //   }
+
+    //   frame.current.contentWindow.document.write(message?.body)
+    // }, [frame])
+
     return (
       <div
         className={classNames(
@@ -232,6 +278,8 @@ export default function MessagesScreen() {
         )}
       >
         {message?.conversation || message?.snippet}
+        {/* <iframe ref={frame} /> */}
+        {/* <div dangerouslySetInnerHTML={{__html: message?.body}} /> */}
       </div>
     );
   };
@@ -300,6 +348,10 @@ export default function MessagesScreen() {
     setCurrentThread(message.threadId);
     setThreadMessages([message]);
     setActiveDraft(false);
+  };
+
+  const handleExpandSidebar = () => {
+    setSidebarExpanded(!sidebarExpanded);
   };
 
   type ComposerProps = {
@@ -442,12 +494,29 @@ export default function MessagesScreen() {
       <div className="messages-screen-container">
         {/* Top nav*/}
         <header className="messages-screen-header">
-          <div className="messages-screen-header-logo-container">
+          <div
+            className={classNames(
+              'messages-screen-header-logo-container',
+              sidebarExpanded && 'expanded'
+            )}
+          >
             <div>
-              <button onClick={handleNewMessageClick}>
-                <PencilAltIcon className="icon icon--small icon--gray" />
+              <button onClick={handleExpandSidebar}>
+                {sidebarExpanded ? (
+                  <ChevronDoubleLeftIcon className="icon icon--small icon--gray" />
+                ) : (
+                  <ChevronDoubleRightIcon className="icon icon--small icon--gray" />
+                )}
               </button>
             </div>
+
+            {sidebarExpanded && (
+              <div>
+                <button onClick={handleNewMessageClick}>
+                  <PencilAltIcon className="icon icon--small icon--gray" />
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Desktop nav area */}
@@ -494,50 +563,7 @@ export default function MessagesScreen() {
               </div>
             </div>
             <div className="right">
-              <div className="actions">
-                <Menu as="div" className="menu-button-container">
-                  <Menu.Button className="menu-button">
-                    <span className="">Open user menu</span>
-                    {account && (
-                      <div className="account-avatar--text">
-                        <p>{account.name.slice(0, 2)}</p>
-                      </div>
-                    )}
-                  </Menu.Button>
-
-                  <Transition
-                    as={Fragment}
-                    enter="enter"
-                    enterFrom="enterFrom"
-                    enterTo="enterTo"
-                    leave="leave"
-                    leaveFrom="leaveFrom"
-                    leaveTo="leaveTo"
-                  >
-                    <Menu.Items className="menu-items">
-                      <div className="menu-items-container">
-                        {userNavigation.map((item) => {
-                          return (
-                            <Menu.Item key={item.href}>
-                              {({ active }) => (
-                                <a
-                                  href={item.href}
-                                  className={classNames(
-                                    active ? 'active' : '',
-                                    'menu-item'
-                                  )}
-                                >
-                                  {item.name}
-                                </a>
-                              )}
-                            </Menu.Item>
-                          );
-                        })}
-                      </div>
-                    </Menu.Items>
-                  </Transition>
-                </Menu>
-              </div>
+              <div className="actions"></div>
             </div>
           </div>
         </header>
